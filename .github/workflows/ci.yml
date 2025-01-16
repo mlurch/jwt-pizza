@@ -13,7 +13,7 @@ jobs:
       - name: Create static deployment file
         run: |
           mkdir dist
-          echo "<h1>Hello Github Pages</h1>" >> dist/index.html
+          echo "<h1>Hello GitHub Pages</h1>" >> dist/index.html
 
       - name: Upadate pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -27,6 +27,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
