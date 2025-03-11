@@ -18,12 +18,10 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
 
-      - name: Set version
+      - name: set version
         id: set_version
         run: |
-          version=$(date +'%Y%m%d.%H%M%S')
-          echo "version=$version" >> "GITHUB_OUTPUT"
-          printf '{"version": "%s" }' "$version" > public/version.json
+          echo "version=$(date +'%Y%m%d.%H%M%S')" >> "$GITHUB_OUTPUT"
 
       - name: Build
         run: |
@@ -50,8 +48,9 @@ jobs:
     permissions:
       id-token: write
     runs-on: ubuntu-latest
-    env:
-      version: ${{needs.build.outputs.version}}
+    environment:
+      name: production
+      url: https://pizza.meganhuff.click
     steps:
       - name: Create OIDC token to AWS
         uses: aws-actions/configure-aws-credentials@v4
@@ -77,15 +76,18 @@ jobs:
       - build
       - deploy
     runs-on: ubuntu-latest
+    env:
+      version: ${{needs.build.outputs.version}}
     steps:
-      - name: Create Release
+      - name: Create staging release
         uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5
-        env:
-          version: ${{needs.build.outputs.version}}
         with:
-          tag: version-${{ env.version }}
-          name: Version ${{ env.version }}
+          tag: stage-version-${{ env.version }}
+          name: Staging ${{ env.version }}
+          generateReleaseNotes: true
           body: |
+            ## Description
+            
             ${{ github.event.head_commit.message }}
-  
+            
             **commit**: ${{ github.sha }}
