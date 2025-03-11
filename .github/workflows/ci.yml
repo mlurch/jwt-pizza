@@ -15,24 +15,18 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-
       - name: set version
         id: set_version
         run: |
           echo "version=$(date +'%Y%m%d.%H%M%S')" >> "$GITHUB_OUTPUT"
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+
       - name: Build
         run: |
           printf '{"version": "%s" }' ${{steps.set_version.outputs.version}} > public/version.json
           npm ci && npm run build
-
-      - name: Update dist artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: package
-          path: dist/
 
       - name: Run tests
         run: |
@@ -50,6 +44,11 @@ jobs:
           git commit -m "generated"
           git push
 
+      - name: Update dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package
+          path: dist/
   deploy:
     needs: build
     permissions:
